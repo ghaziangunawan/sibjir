@@ -1,0 +1,33 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  VERCEL_PROJECT_ID: prj_A1zlUNHgEkKP4h4ktRI9s5YyrIIV
+  VERCEL_ORG_ID: team_1ypQRTWJV6s2613bYfri3LTW
+  VERCEL_TOKEN: jpW9uSE5dDj9TnCoETSlUfOY
+
+build:
+  stage: build
+  image: python:3.9
+  script:
+    - pip install -r requirements.txt
+    - python manage.py collectstatic --noinput
+  only:
+    - main
+    - pbi1
+    - staging
+
+deploy:
+  stage: deploy
+  script:
+    - apt-get update -qy
+    - apt-get install -y unzip
+    - curl -L https://github.com/vercel/vercel/releases/latest/download/vercel-linux -o /usr/local/bin/vercel
+    - chmod +x /usr/local/bin/vercel
+    - vercel --version
+    - vercel deploy --prod --confirm --token $VERCEL_TOKEN
+  only:
+    - main
+    - pbi1
+    - staging
